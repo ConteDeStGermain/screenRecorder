@@ -1,24 +1,24 @@
-# import cv2
-# import pyautogui
-# import numpy as np
-# import sounddevice as sd
-# from moviepy.editor import VideoFileClip, AudioFileClip
+import cv2
+import pyautogui
+import numpy as np
+from moviepy.editor import VideoFileClip, AudioFileClip
+from scipy.io.wavfile import write
 
-# # Define the codec using VideoWriter_fourcc() and create a VideoWriter object
-# seconds = 10  # Define the duration of the recording
-# fs = 44100  # Sample rate
+import soundcard as sc
+import soundfile as sf
 
-# # myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
-# # sd.wait()  # Wait for the recording to finish
+OUTPUT_FILE_NAME = "out.wav"    # file name.
+SAMPLE_RATE = 48000              # [Hz]. sampling rate.
+RECORD_SEC = 10                  # [sec]. duration recording audio.
 
-# fourcc = cv2.VideoWriter_fourcc(*"XVID")
-# out = cv2.VideoWriter("lecture.avi", fourcc, 20.0, (1920, 1080))
+with sc.get_microphone(id=str(sc.default_speaker().name), include_loopback=True).recorder(samplerate=SAMPLE_RATE) as mic:
+    # record audio with loopback from default speaker.
+    data = mic.record(numframes=SAMPLE_RATE*RECORD_SEC)
+    
+    # change "data=data[:, 0]" to "data=data", if you would like to write audio as multiple-channels.
+    sf.write(file=OUTPUT_FILE_NAME, data=data[:, 0], samplerate=SAMPLE_RATE)
 
-# # Record audio
-# # myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
 
-# # Write audio to file
-# # sd.write("lecture_audio.wav", myrecording, fs)
 
 # # Record video
 # while True:
@@ -33,20 +33,16 @@
 # out.release()
 # cv2.destroyAllWindows()
 
-# # # Load video and audio files
-# # video = VideoFileClip("lecture.mp4")
-# # audio = AudioFileClip("lecture_audio.wav")
+# # Load video and audio files
+# video = VideoFileClip("lecture.mp4")
+# audio = AudioFileClip("out.wav")
 
-# # # Set the audio of the video clip
-# # video = video.set_audio(audio)
+# # Set the audio of the video clip
+# video = video.set_audio(audio)
 
-# # # Write the result to a file
-# # video.write_videofile("lecture.mp4", codec='libx264')
+# # Write the result to a file
+# video.write_videofile("lecture.mp4", codec='libx264')
 
-# importing the required packages
-import pyautogui
-import cv2
-import numpy as np
 
 # Specify resolution
 resolution = (1920, 1080)
@@ -59,7 +55,7 @@ filename = "Recording.avi"
 
 # Specify frames rate. We can choose any 
 # value and experiment with it
-fps = 60.0
+fps = 30.0
 
 # Creating a VideoWriter object
 out = cv2.VideoWriter(filename, codec, fps, resolution)
@@ -94,5 +90,16 @@ while True:
 # Release the Video writer
 out.release()
 
-# Destroy all windows
+# # Destroy all windows
 cv2.destroyAllWindows()
+
+
+# Load video and audio files
+video = VideoFileClip("Recording.avi")
+audio = AudioFileClip("out.wav")
+
+# Set the audio of the video clip
+video = video.set_audio(audio)
+
+# Write the result to a file
+video.write_videofile("lecture.mp4", codec='libx264')
