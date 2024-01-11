@@ -22,7 +22,11 @@
   },
   "homepage": "https://github.com/ConteDeStGermain/screenRecorder#readme",
   "dependencies": {
-    "moment": "^2.29.4"
+    "moment": "^2.29.4",
+    "puppeteer": "^21.7.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "puppeteer-screen-recorder": "^2.1.2"
   },
   "devDependencies": {
     "electron": "^27.0.3"
