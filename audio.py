@@ -1,35 +1,30 @@
 import soundcard as sc
 import soundfile as sf
+import sys
 
-OUTPUT_FILE_NAME = "out.wav"    # file name.
-SAMPLE_RATE = 48000              # [Hz]. sampling rate.
-RECORD_SEC = 30                  # [sec]. duration recording audio.
+# Set default values
+DEFAULT_OUTPUT_FILE_NAME = "out.wav"
+SAMPLE_RATE = 48000
+RECORD_SEC_1_HOUR = 3600
+RECORD_SEC_2_HOURS = 7200
+RECORD_SEC_DEFAULT = 15
 
-with sc.get_microphone(id=str(sc.default_speaker().name), include_loopback=True).recorder(samplerate=SAMPLE_RATE) as mic:
-    # record audio with loopback from default speaker.
-    data = mic.record(numframes=SAMPLE_RATE*RECORD_SEC)
-    
-    # change "data=data[:, 0]" to "data=data", if you would like to write audio as multiple-channels.
-    sf.write(file=OUTPUT_FILE_NAME, data=data[:, 0], samplerate=SAMPLE_RATE)
+def record_and_save(output_file_name, record_duration_sec):
+    with sc.get_microphone(id=str(sc.default_speaker().name), include_loopback=True).recorder(samplerate=SAMPLE_RATE) as mic:
+        data = mic.record(numframes=SAMPLE_RATE*record_duration_sec)
+        sf.write(file=output_file_name, data=data[:, 0], samplerate=SAMPLE_RATE)
 
-# from moviepy.editor import VideoFileClip, AudioFileClip
+if __name__ == "__main__":
+    # Check if command-line arguments are provided
+    if len(sys.argv) > 1:
+        output_file_name = sys.argv[1]
+    else:
+        output_file_name = DEFAULT_OUTPUT_FILE_NAME
 
-# def combine_audio_video(video_path, audio_path, output_path):
-#     # Load video clip
-#     video_clip = VideoFileClip(video_path)
-    
-#     # Load audio clip
-#     audio_clip = AudioFileClip(audio_path)
-    
-#     # Set video clip audio to the loaded audio clip
-#     video_clip = video_clip.set_audio(audio_clip)
-    
-#     # Write the result to a new file
-#     video_clip.write_videofile(output_path, codec='libx264', audio_codec='aac')
+    # Check if a second command-line argument is provided for the recording duration
+    if len(sys.argv) > 2 and sys.argv[2] in ["0", "1"]:
+        record_duration_sec = RECORD_SEC_1_HOUR if sys.argv[2] == "1" else RECORD_SEC_2_HOURS
+    else:
+        record_duration_sec = RECORD_SEC_DEFAULT
 
-# if __name__ == "__main__":
-#     video_path = "video.mp4"
-#     audio_path = "out.wav"
-#     output_path = "output_video.mp4"
-    
-#     combine_audio_video(video_path, audio_path, output_path)
+    record_and_save(output_file_name, record_duration_sec)
