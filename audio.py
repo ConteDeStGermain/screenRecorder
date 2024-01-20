@@ -1,12 +1,13 @@
 import soundcard as sc
 import soundfile as sf
 import sys
+import time
 
 # Set default values
 DEFAULT_OUTPUT_FILE_NAME = "out.wav"
 SAMPLE_RATE = 48000
 RECORD_SEC_1_HOUR = 3600
-RECORD_SEC_2_HOURS = 7200
+RECORD_SEC_2_HOURS = 60
 RECORD_SEC_DEFAULT = 15
 
 def record_and_save(output_file_name, record_duration_sec):
@@ -16,6 +17,8 @@ def record_and_save(output_file_name, record_duration_sec):
 
 if __name__ == "__main__":
     # Check if command-line arguments are provided
+
+    time.sleep(10)
     if len(sys.argv) > 1:
         output_file_name = sys.argv[1]
     else:

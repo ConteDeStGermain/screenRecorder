@@ -15,6 +15,7 @@ const wait = ms => new Promise(res => setTimeout(res, ms));
   const browser = await puppeteer.launch({ headless: false, args: ['--start-maximized'] });
   const page = await browser.newPage();
   await page.goto('https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fclassroom.google.com%2F&emr=1&followup=https%3A%2F%2Fclassroom.google.com%2F&ifkv=ASKXGp38XQD342-5MlElrLTgg7IAgglt6UixzE8dNhNGh8YoEeZdidrunhedzyLyId_408CDPPkg&passive=1209600&service=classroom&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S-720719761%3A1704937311118373&theme=glif');
+  // await page.goto('https://www.youtube.com/watch?v=3VfL1PH8D4A&ab_channel=FunkyScott47');
 
   let urlGENERAL = 'https://meet.google.com/uom-cpsq-msk'
   let urlIFR = 'https://meet.google.com/ror-cryv-jaq'
@@ -43,7 +44,7 @@ const wait = ms => new Promise(res => setTimeout(res, ms));
   await wait(3600000);
   await record('vineri_Pastorala', 0);
 
-  await tab1.close()
+  // await tab1.close()
 
  
   await browser.close();
