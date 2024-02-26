@@ -8,10 +8,10 @@ const { exec } = require('child_process');
 const wait = ms => new Promise(res => setTimeout(res, ms));
 
 (async () => {
-  let startTime = 1;
-  let timeInSeconds = calculateTime(startTime);
-  console.log(timeInSeconds + ` second till ${startTime} am...`);
-  await wait(timeInSeconds*1000);
+  // let startTime = 1;
+  // let timeInSeconds = calculateTime(startTime);
+  // console.log(timeInSeconds + ` second till ${startTime} am...`);
+  // await wait(timeInSeconds*1000);
 
   const browser = await puppeteer.launch({ headless: false, args: ['--start-maximized'] });
   const page = await browser.newPage();
@@ -40,15 +40,15 @@ const wait = ms => new Promise(res => setTimeout(res, ms));
 
   let tab1 = await main(page, urlGENERAL, arePeriferialsOFF, browser); // IFR
   arePeriferialsOFF = true;
-  await record('joi_omiletica', 0);
+  await record('joi_omiletica', 0, tab1, urlGENERAL);
 
-  await tab1.close()
+  // await tab1.close()
 
-  let tab2 = await main(page, urlDREPTcanonic, arePeriferialsOFF, browser); // IFR
-  arePeriferialsOFF = true;
-  await record('joi_DreptCanonic', 0);
+  // let tab2 = await main(page, urlDREPTcanonic, arePeriferialsOFF, browser); // IFR
+  // arePeriferialsOFF = true;
+  // await record('joi_DreptCanonic', 0);
 
-  await tab2.close()
+  // await tab2.close()
 
   await browser.close();
 })();
@@ -65,13 +65,19 @@ function runScript(script) {
   });
 }
 
-async function record(name, is1Hour) {
+async function record(name, is1Hour, page, meetURL) {
   try {
-    // Run both scripts in parallel
     await Promise.all([
       runScript(`python winRecorder.py ${is1Hour}`),
-      runScript(`python audio.py ${name}.wav ${is1Hour}`)
+      // runScript(`python audio.py ${name}.wav ${is1Hour}`),
+      (async function monitorDisconnection(meetURL) {
+        while (true) {
+          await checkAndReloadPage(page, meetURL);
+          await new Promise(resolve => setTimeout(resolve, 60000)); // Check every 60 seconds
+        }
+      })(meetURL)
     ]);
+
 
     console.log('All scripts executed successfully.');
   } catch (error) {
@@ -81,11 +87,18 @@ async function record(name, is1Hour) {
 }
 
 
+async function checkAndReloadPage(page, meetURL) {
+  const isDisconnected = await page.evaluate(() => document.body.innerText.includes("No camera found"));
+  if (isDisconnected) {
+    await page.goto(`${meetURL}`);
+  }
+}
+
 async function main(page, meetURL, arePeriferialsOFF, browser) {
   const newPage = await browser.newPage();
 
-  // Navigate to the desired URL in the new tab
-  await newPage.goto(`${meetURL}`); // Morala
+  
+  await newPage.goto(`${meetURL}`); 
 
   await wait(5000);
   if (!arePeriferialsOFF) {
