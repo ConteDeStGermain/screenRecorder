@@ -40,15 +40,15 @@ const wait = ms => new Promise(res => setTimeout(res, ms));
 
   let tab1 = await main(page, urlGENERAL, arePeriferialsOFF, browser); // IFR
   arePeriferialsOFF = true;
-  await record('joi_omiletica', 0, tab1, urlGENERAL);
+  await record( 0, tab1, urlGENERAL);
 
-  // await tab1.close()
+  await tab1.close()
 
-  // let tab2 = await main(page, urlDREPTcanonic, arePeriferialsOFF, browser); // IFR
-  // arePeriferialsOFF = true;
-  // await record('joi_DreptCanonic', 0);
+  let tab2 = await main(page, urlDREPTcanonic, arePeriferialsOFF, browser); // IFR
+  arePeriferialsOFF = true;
+  await record(0, tab2, urlDREPTcanonic);
 
-  // await tab2.close()
+  await tab2.close()
 
   await browser.close();
 })();
@@ -65,25 +65,30 @@ function runScript(script) {
   });
 }
 
-async function record(name, is1Hour, page, meetURL) {
+async function record(is1Hour, page, meetURL) {
+  let keepMonitoring = true; 
   try {
     await Promise.all([
-      runScript(`python winRecorder.py ${is1Hour}`),
-      // runScript(`python audio.py ${name}.wav ${is1Hour}`),
+      (async () => {
+        await runScript(`python winRecorder.py ${is1Hour}`);
+        keepMonitoring = false;
+      })(),
+      // Uncomment if needed: runScript(`python audio.py ${name}.wav ${is1Hour}`),
       (async function monitorDisconnection(meetURL) {
-        while (true) {
+        while (keepMonitoring) {
           await checkAndReloadPage(page, meetURL);
           await new Promise(resolve => setTimeout(resolve, 60000)); // Check every 60 seconds
         }
       })(meetURL)
     ]);
 
-
     console.log('All scripts executed successfully.');
   } catch (error) {
     console.error(`Error: ${error}`);
+    keepMonitoring = false; 
   }
-  console.log(`stopped recording ${name} at ` + getCurrentTime());
+
+  console.log('stopped recording at ' + getCurrentTime());
 }
 
 

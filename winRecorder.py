@@ -27,7 +27,7 @@ if __name__ == "__main__":
     if is1Hour:
         time.sleep(3600)
     else:
-        time.sleep(60)
+        time.sleep(5)
 
     # Press Windows + Alt + R again
     press_windows_alt_r()
